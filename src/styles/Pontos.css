@@ -1,19 +1,156 @@
-/* src/styles/Pontos.css */
-.points-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-.btn-simulate { background: var(--warn); color: #000; font-weight: 600; padding: 10px 14px; border: none; border-radius: 8px; cursor: pointer; }
+/* Adicione isso no final do seu src/styles/Pontos.css */
 
-.score-board { background: linear-gradient(135deg, var(--bg2) 0%, var(--teal2) 100%); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius-lg); text-align: center; margin-bottom: 20px; }
-.score-label { font-size: 0.8rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
-.score-val { font-family: 'Syne', sans-serif; font-size: 2.5rem; font-weight: 700; color: var(--accent); margin-top: 4px; }
-.score-val span { font-size: 1rem; color: var(--text2); }
+.pontos-dashboard-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
 
-.rules-card { background: var(--bg1); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius-lg); margin-bottom: 24px; }
-.rules-card h3 { font-family: 'Syne', sans-serif; margin-bottom: 12px; font-size: 0.95rem; }
-.rules-card ul { list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.88rem; color: var(--text2); }
+@media (max-width: 900px) {
+  .pontos-dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+}
 
-.history-section h3 { font-family: 'Syne', sans-serif; font-size: 0.95rem; margin-bottom: 12px; }
-.history-list { display: flex; flex-direction: column; gap: 8px; }
-.history-row { background: var(--bg1); border: 1px solid var(--border); padding: 12px 16px; border-radius: var(--radius); display: flex; justify-content: space-between; align-items: center; }
-.hist-date { font-size: 0.75rem; color: var(--text3); display: block; }
-.hist-desc { font-size: 0.85rem; color: var(--text1); }
-.hist-pts { font-weight: 700; color: var(--accent); font-size: 0.9rem; }
+/* --- RANKING GLOBAL --- */
+.ranking-container {
+  background: var(--fu-surface-solid);
+  border: 1px solid var(--fu-border);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 10px 30px var(--fu-shadow);
+}
+
+.ranking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--fu-border);
+}
+
+.ranking-header h3 {
+  margin: 0;
+  font-family: 'Syne', sans-serif;
+  color: var(--fu-text-main);
+  font-size: 1.4rem;
+}
+
+.ranking-badge {
+  background: rgba(44, 182, 125, 0.15);
+  color: var(--fu-primary);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.ranking-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ranking-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: var(--fu-bg);
+  border-radius: 12px;
+  border: 1px solid transparent;
+  transition: transform 0.2s;
+}
+
+.ranking-item:hover {
+  transform: translateX(5px);
+  border-color: var(--fu-border);
+}
+
+.ranking-item.top-3 {
+  background: linear-gradient(90deg, rgba(44, 182, 125, 0.05) 0%, var(--fu-bg) 100%);
+  border: 1px solid rgba(44, 182, 125, 0.2);
+}
+
+.ranking-posicao {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--fu-text-muted);
+  width: 40px;
+  text-align: center;
+  margin-right: 12px;
+}
+
+.ranking-info {
+  flex: 1;
+}
+
+.ranking-nome {
+  color: var(--fu-text-main);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.ranking-pontos-valor {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--fu-primary);
+}
+
+/* --- REGRAS GRID AJUSTADO --- */
+.regras-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.regra-card {
+  background: var(--fu-surface-solid);
+  border: 1px solid var(--fu-border);
+  border-radius: 16px;
+  padding: 16px 20px; /* Padding reduzido para caber melhor */
+  display: flex;
+  align-items: center;
+  gap: 16px; /* Espaço reduzido entre o número e o texto */
+  transition: transform 0.2s ease;
+}
+
+.regra-card:hover {
+  transform: translateX(8px);
+  border-color: var(--fu-primary);
+}
+
+.regra-pontos {
+  font-size: 1.4rem; /* Fonte um pouco menor */
+  font-weight: 800;
+  color: var(--fu-primary);
+  background: var(--fu-bg);
+  padding: 12px 16px;
+  border-radius: 12px;
+  min-width: 65px; /* Largura mínima menor para não empurrar o texto */
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.regra-textos {
+  flex: 1; /* Isto garante que o texto ocupa o resto do espaço direitinho! */
+  text-align: left;
+}
+
+.regra-textos h4 {
+  margin: 0 0 4px 0;
+  color: var(--fu-text-main);
+  font-size: 1rem;
+}
+
+.regra-textos p {
+  margin: 0;
+  color: var(--fu-text-muted);
+  font-size: 0.85rem; /* Texto ligeiramente menor para não quebrar tantas linhas */
+  line-height: 1.4;
+}

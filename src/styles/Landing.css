@@ -1,0 +1,331 @@
+/* src/styles/Landing.css */
+
+/* --- CONFIGURAÇÕES DE CORES: TEMA ESCURO (PADRÃO) --- */
+:root {
+  --fu-bg: #060E11;               /* Fundo ultra escuro e confortável */
+  --fu-bg-gradient: radial-gradient(circle at 80% 20%, #0d252e 0%, #060E11 100%);
+  --fu-surface: rgba(14, 30, 36, 0.7); /* Efeito translúcido glass */
+  --fu-surface-solid: #0E1E24;
+  --fu-border: rgba(44, 182, 125, 0.15); /* Bordas com brilho sutil */
+  --fu-text-main: #FFFFFF;
+  --fu-text-muted: #94A3B8;
+  
+  /* Detalhes e Acentos Exigidos pelo PDF */
+  --fu-primary: #2CB67D;          /* Verde FlowUp Esmeralda */
+  --fu-focus-blue: #3B82F6;       /* Azul Foco */
+  --fu-premium-purple: #8B5CF6;   /* Roxo Premium */
+  --fu-shadow: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] {
+  --fu-bg: #FFFFFF;               
+  --fu-bg-gradient: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
+  --fu-surface: rgba(241, 245, 249, 0.9);
+  --fu-surface-solid: #F1F5F9;
+  --fu-border: #CBD5E1;
+  --fu-text-main: #0F172A;        /* Texto escuro no modo claro */
+  --fu-text-muted: #475569;       /* Subtítulos bem visíveis */
+  
+  --fu-primary: #10B981;          
+  --fu-focus-blue: #2563EB;
+  --fu-premium-purple: #7C3AED;
+  --fu-shadow: rgba(15, 23, 42, 0.1);
+}
+
+/* --- ADICIONE OU SUBSTITUA ISSO NO SEU ARQUIVO DE ESTILOS --- */
+.flowup-modal-window {
+  background: var(--fu-surface-solid) !important;
+  color: var(--fu-text-main) !important;
+  border: 1px solid var(--fu-border);
+}
+
+/* Força os inputs a mudarem de cor de texto baseado no tema */
+.flowup-input-text {
+  background-color: var(--fu-bg) !important;
+  color: var(--fu-text-main) !important;
+  border: 1px solid var(--fu-border) !important;
+  padding: 12px;
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.flowup-input-text::placeholder {
+  color: var(--fu-text-muted);
+}
+
+/* Ajuste dos textos das labels do formulário */
+.flowup-form-group label {
+  color: var(--fu-text-main) !important;
+  font-weight: 600;
+}
+
+/* --- ESTRUTURA E LAYOUT --- */
+.fu-landing {
+  background: var(--fu-bg-gradient);
+  background-color: var(--fu-bg);
+  color: var(--fu-text-main);
+  min-height: 100vh;
+  font-family: 'DM Sans', sans-serif;
+  transition: background 0.4s ease, color 0.4s ease;
+  overflow-x: hidden;
+}
+
+.fu-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* --- HEADER / NAVIGATION --- */
+.fu-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 0;
+}
+
+.fu-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Syne', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.fu-logo-mark {
+  background: linear-gradient(135deg, var(--fu-primary) 0%, var(--fu-focus-blue) 100%);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #060E11;
+  font-weight: 900;
+  box-shadow: 0 4px 12px rgba(44, 182, 125, 0.2);
+}
+
+.fu-nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Botões Customizados */
+.fu-btn-toggle {
+  background: var(--fu-surface-solid);
+  border: 1px solid var(--fu-border);
+  color: var(--fu-text-main);
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px var(--fu-shadow);
+}
+
+.fu-btn-toggle:hover {
+  transform: scale(1.05);
+  border-color: var(--fu-primary);
+}
+
+.fu-btn-premium {
+  background: linear-gradient(135deg, var(--fu-premium-purple) 0%, #6D28D9 100%);
+  color: #FFFFFF;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
+}
+
+.fu-btn-premium:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+}
+
+.fu-btn-login {
+  background: transparent;
+  color: var(--fu-text-main);
+  border: 1px solid var(--fu-border);
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fu-btn-login:hover {
+  background: var(--fu-text-main);
+  color: var(--fu-bg);
+}
+
+/* --- HERO SECTION --- */
+.fu-hero {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  align-items: center;
+  gap: 60px;
+  padding: 80px 0;
+}
+
+@media (max-width: 900px) {
+  .fu-hero { grid-template-columns: 1fr; text-align: center; padding: 40px 0; }
+  .fu-hero-preview { margin: 0 auto; }
+}
+
+.fu-hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+@media (max-width: 900px) {
+  .fu-hero-content { align-items: center; }
+}
+
+.fu-badge {
+  background: rgba(44, 182, 125, 0.12);
+  color: var(--fu-primary);
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  border: 1px solid rgba(44, 182, 125, 0.2);
+}
+
+.fu-hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 3.8rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 0 0 24px 0;
+  letter-spacing: -0.02em;
+}
+
+.fu-hero-title span {
+  background: linear-gradient(135deg, var(--fu-primary) 0%, var(--fu-focus-blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.fu-hero-p {
+  font-size: 1.15rem;
+  color: var(--fu-text-muted);
+  line-height: 1.6;
+  margin: 0 0 40px 0;
+  max-width: 560px;
+}
+
+.fu-btn-primary {
+  background-color: var(--fu-primary);
+  color: #060E11;
+  border: none;
+  padding: 16px 36px;
+  border-radius: 14px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 8px 24px rgba(44, 182, 125, 0.25);
+}
+
+.fu-btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(44, 182, 125, 0.4);
+}
+
+/* Mockup de Apresentação Exclusivo (Substituindo imagens prontas) */
+.fu-hero-preview {
+  background: var(--fu-surface-solid);
+  border: 1px solid var(--fu-border);
+  border-radius: 24px;
+  padding: 24px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 30px 60px var(--fu-shadow);
+}
+
+.fu-mock-header {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.fu-mock-dot { width: 10px; height: 10px; border-radius: 50%; background: #EF4444; }
+.fu-mock-dot:nth-child(2) { background: #F59E0B; }
+.fu-mock-dot:nth-child(3) { background: #10B981; }
+
+.fu-mock-timer {
+  text-align: center;
+  padding: 30px 0;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--fu-border);
+}
+
+/* --- SEÇÃO DE REQUISITOS E FUNÇÕES --- */
+.fu-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 28px;
+  padding: 60px 0 100px 0;
+}
+
+.fu-feature-card {
+  background: var(--fu-surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--fu-border);
+  padding: 32px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px var(--fu-shadow);
+}
+
+.fu-feature-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--fu-primary);
+}
+
+.fu-feat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(44, 182, 125, 0.1);
+  color: var(--fu-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.fu-feature-card h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.25rem;
+  margin: 0 0 12px 0;
+}
+
+.fu-feature-card p {
+  color: var(--fu-text-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}

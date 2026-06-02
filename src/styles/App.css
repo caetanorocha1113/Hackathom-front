@@ -1,8 +1,14 @@
-/* src/styles/App.css */
-*, *::before, *::after {
-  box-sizing: border-box;
+/* Reseta as margens padrão do navegador */
+* {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+}
+
+body, html, #root {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--fu-bg, #060E11); /* Garante que o fundo base do HTML seja escuro */
 }
 
 :root {
@@ -58,3 +64,26 @@ body {
   border: none; background: none; width: 100%; text-align: left; transition: all var(--trans);
 }
 .sidebar-item:hover, .sidebar-item.active { background: var(--accent-dim); color: var(--accent); }
+
+/* --- NAVEGAÇÃO SUPERIOR (PILLS) --- */
+.nav-pill {
+  padding: 10px 24px;
+  background: transparent;
+  border: none;
+  color: var(--fu-text-muted);
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.nav-pill:hover {
+  color: var(--fu-text-main);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-pill.active {
+  background: var(--fu-primary);
+  color: #060E11; /* Texto escuro para contrastar com o botão verde */
+}

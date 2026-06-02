@@ -1,104 +1,247 @@
 // src/components/Painel.jsx
 import React, { useState, useEffect } from 'react';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { Pie } from 'react-chartjs-2';
 import '../styles/Painel.css';
 
-// Registra os componentes necessários do Chart.js
-ChartJS.register(ArcElement, Tooltip, Legend);
-
 export default function Painel() {
-  // Simulando estados de sessões e dados, garantindo arrays vazios por padrão para evitar o erro do .map()
-  const [sessoes, setSessoes] = useState([]); 
-  const [tempoFoco, setTempoFoco] = useState(0);
-  const [tempoDistracao, setTempoDistracao] = useState(0);
+  const [estatisticas, setEstatisticas] = useState({
+    tempoTotalHoje: "0h 0m",
+    sessoesConcluidas: 0,
+    tentativasBloqueio: 0, 
+    sitesTop: [],
+    limitesProgresso: [] // NOVO: Vai guardar os limites reais do banco
+  });
   const [loading, setLoading] = useState(true);
 
+  // Vai buscar as sessões E os limites reais à tua API
   useEffect(() => {
-    // Simulando ou buscando dados do backend futuramente
-    // Para testar agora, vamos deixar zerado para simular o banco vazio de um novo usuário
-    setSessoes([]); 
-    setTempoFoco(0);
-    setTempoDistracao(0);
-    setLoading(false);
+    const fetchDados = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        // Faz os dois pedidos ao banco de dados ao mesmo tempo para ser mais rápido!
+        const [resSessoes, resLimites] = await Promise.all([
+          fetch('http://localhost:3000/api/sessoes', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          }),
+          fetch('http://localhost:3000/api/limites', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          })
+        ]);
+
+        if (!resSessoes.ok || !resLimites.ok) {
+          throw new Error('Falha ao buscar dados do banco');
+        }
+
+        const sessoes = await resSessoes.json();
+        const limites = await resLimites.json(); // Limites que vêm do teu supabase
+
+        // 1. Processar os dados das sessões de hoje
+        let tempoTotalMinutos = 0;
+        let sessoesHoje = 0;
+        const sitesMap = {};
+        const hojeIso = new Date().toISOString().split('T')[0];
+
+        sessoes.forEach(sessao => {
+          if (sessao.inicio && sessao.inicio.startsWith(hojeIso)) {
+            tempoTotalMinutos += sessao.tempo_total;
+            sessoesHoje++;
+          }
+          const site = sessao.id_site || 'Desconhecido';
+          if (!sitesMap[site]) sitesMap[site] = 0;
+          sitesMap[site] += sessao.tempo_total;
+        });
+
+        // 2. Formatar tempo total para o topo
+        const horas = Math.floor(tempoTotalMinutos / 60);
+        const minutos = tempoTotalMinutos % 60;
+        const tempoFormatado = `${horas}h ${minutos}m`;
+
+        // 3. Organizar o Top 3 Sites
+        const sitesArray = Object.keys(sitesMap).map((site) => {
+          const tempoSite = sitesMap[site];
+          return {
+            nome: site,
+            tempoMinutos: tempoSite,
+            tempo: `${Math.floor(tempoSite / 60)}h ${tempoSite % 60}m`,
+            categoria: "Monitorizado",
+            cor: "#3B82F6",
+            percentagem: tempoTotalMinutos > 0 ? Math.round((tempoSite / tempoTotalMinutos) * 100) : 0
+          };
+        }).sort((a, b) => b.tempoMinutos - a.tempoMinutos).slice(0, 3);
+
+        if (sitesArray[0]) sitesArray[0].cor = "#EF4444";
+        if (sitesArray[1]) sitesArray[1].cor = "#F59E0B";
+        if (sitesArray[2]) sitesArray[2].cor = "#10B981";
+
+        // 4. NOVO: Processar os Limites cruzando com o tempo gasto hoje
+        const limitesCalculados = limites.map(limite => {
+          // Procura quanto tempo gastou no site do limite. Se não achou, gastou 0.
+          const tempoGastoMinutos = sitesMap[limite.id_site] || 0; 
+          const limiteMinutos = limite.tempo_limite;
+          
+          let percentagem = Math.round((tempoGastoMinutos / limiteMinutos) * 100);
+          if (percentagem > 100) percentagem = 100; // Para a barra não passar do ecrã
+
+          // Definir cores e mensagens baseadas na percentagem gasta
+          let corBarra = '#10B981'; // Verde (Seguro)
+          let statusClasse = 'seguro';
+          let mensagem = '🟢 Seguro: Estás no caminho para os +10 pontos!';
+
+          if (percentagem >= 100) {
+            corBarra = '#EF4444'; // Vermelho (Estourou)
+            statusClasse = 'atencao'; // usando o teu css existente para dar destaque
+            mensagem = '🔴 Limite excedido! Foco perdido.';
+          } else if (percentagem >= 75) {
+            corBarra = '#F59E0B'; // Laranja (Quase lá)
+            statusClasse = 'atencao';
+            mensagem = '🟠 Atenção: Quase a atingir o limite configurado.';
+          }
+
+          return {
+            nome: limite.id_site,
+            tempoGastoString: tempoGastoMinutos < 60 ? `${tempoGastoMinutos}m` : `${Math.floor(tempoGastoMinutos/60)}h ${tempoGastoMinutos%60}m`,
+            limiteString: limiteMinutos < 60 ? `${limiteMinutos}m` : `${Math.floor(limiteMinutos/60)}h ${limiteMinutos%60}m`,
+            percentagem,
+            corBarra,
+            statusClasse,
+            mensagem
+          };
+        });
+
+        // Atualizar o estado da tela
+        setEstatisticas({
+          tempoTotalHoje: tempoFormatado,
+          sessoesConcluidas: sessoesHoje,
+          tentativasBloqueio: 0,
+          sitesTop: sitesArray,
+          limitesProgresso: limitesCalculados // Guarda os limites reais
+        });
+
+      } catch (error) {
+        console.error("Erro ao carregar dados do painel:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDados();
   }, []);
 
-  // Configuração dos dados do Gráfico de Pizza (Pie Chart)
-  // Se estiver tudo zerado, mostramos um gráfico padrão cinza ou indicativo de foco inicial
-  const dataGrafico = {
-    labels: ['Tempo de Foco', 'Tempo em Distrações'],
-    datasets: [
-      {
-        data: tempoFoco === 0 && tempoDistracao === 0 ? [100, 0] : [tempoFoco, tempoDistracao],
-        backgroundColor: tempoFoco === 0 && tempoDistracao === 0 
-          ? ['rgba(45, 212, 160, 0.2)', 'rgba(255, 255, 255, 0.1)'] 
-          : ['#2dd4a0', '#ff4d4d'],
-        borderColor: ['#1e3d4d', '#1e3d4d'],
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const opcoesGrafico = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: { color: '#d6edf5', font: { family: 'DM Sans' } }
-      }
-    }
-  };
+  const hoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
 
   if (loading) {
-    return <div style={{ color: 'var(--text2)' }}>Carregando estatísticas...</div>;
+    return (
+      <div className="flowup-painel-page" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+        <h2 style={{ color: 'var(--fu-text-muted)' }}>A sincronizar com o banco de dados... ⏳</h2>
+      </div>
+    );
   }
 
   return (
-    <div className="painel-container">
+    <div className="flowup-painel-page">
+      
+      {/* Cabeçalho do Painel */}
       <div className="painel-header">
-        <h2>Dashboard de Produtividade</h2>
-        <p>Acompanhe em tempo real o seu balanço diário de foco contra distrações.</p>
-      </div>
-
-      {/* Cards de Resumo */}
-      <div className="painel-cards">
-        <div className="card-status foco">
-          <h3>Tempo de Foco</h3>
-          <p className="card-numero">{tempoFoco} min</p>
+        <div>
+          <h2 className="painel-titulo">Olá, Estudante! 👋</h2>
+          <p className="painel-subtitulo">O teu resumo de uso para {hoje}.</p>
         </div>
-        <div className="card-status distracao">
-          <h3>Tempo em Distrações</h3>
-          <p className="card-numero">{tempoDistracao} min</p>
+        <div className="status-foco ativo">
+          <span className="pulsar"></span> Sincronizado ao Vivo
         </div>
       </div>
 
-      {/* Seção Principal: Gráfico + Histórico */}
-      <div className="painel-conteudo">
-        <div className="grafico-box">
-          <h3>Visão Geral Diária</h3>
-          <div style={{ maxWidth: '280px', margin: '0 auto' }}>
-            <Pie data={dataGrafico} options={opcoesGrafico} />
+      {/* Cartões de Indicadores (KPIs) */}
+      <div className="kpi-grid">
+        <div className="kpi-card">
+          <div className="kpi-icone" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10B981' }}>⏱️</div>
+          <div className="kpi-info">
+            <span className="kpi-label">Tempo Total (Hoje)</span>
+            <span className="kpi-valor">{estatisticas.tempoTotalHoje}</span>
           </div>
         </div>
 
-        <div className="historico-box">
-          <h3>Sessões Recentes</h3>
-          <div className="historico-lista">
-            {/* 🛡️ AQUI OCORRIA O ERRO: Adicionado o check de segurança se sessoes existe e tem tamanho */}
-            {!sessoes || sessoes.length === 0 ? (
-              <p style={{ color: 'var(--text3)', fontSize: '0.9rem', textAlign: 'center', marginTop: '20px' }}>
-                Nenhuma sessão de foco registrada hoje. Comece uma nova atividade!
-              </p>
-            ) : (
-              sessoes.map((sessao, index) => (
-                <div key={sessao.id || index} className="historico-item">
-                  <span>{sessao.descricao || 'Sessão de Foco'}</span>
-                  <span className="badge-tempo">{sessao.duracao} min</span>
+        <div className="kpi-card">
+          <div className="kpi-icone" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3B82F6' }}>📈</div>
+          <div className="kpi-info">
+            <span className="kpi-label">Sessões Registadas</span>
+            <span className="kpi-valor">{estatisticas.sessoesConcluidas} hoje</span>
+          </div>
+        </div>
+
+        <div className="kpi-card destaque-positivo">
+          <div className="kpi-icone" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#F59E0B' }}>🛡️</div>
+          <div className="kpi-info">
+            <span className="kpi-label">Tentativas de Fuga</span>
+            <span className="kpi-valor">{estatisticas.tentativasBloqueio} hoje</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Seção Principal - Gráficos / Listas */}
+      <div className="painel-conteudo-grid">
+        
+        {/* Top Sites Acessados */}
+        <div className="painel-box">
+          <h3>Top Sites Acessados</h3>
+          <p className="box-desc">Onde o teu tempo foi investido hoje.</p>
+          
+          <div className="sites-lista">
+            {estatisticas.sitesTop.length > 0 ? (
+              estatisticas.sitesTop.map((site, index) => (
+                <div key={index} className="site-item">
+                  <div className="site-info-topo">
+                    <span className="site-nome" style={{ textTransform: 'capitalize' }}>{site.nome}</span>
+                    <span className="site-tempo">{site.tempo}</span>
+                  </div>
+                  <div className="site-barra-bg">
+                    <div 
+                      className="site-barra-fill" 
+                      style={{ width: `${site.percentagem}%`, background: site.cor }}
+                    ></div>
+                  </div>
+                  <span className="site-categoria">{site.categoria} ({site.percentagem}%)</span>
                 </div>
               ))
+            ) : (
+              <p style={{ color: 'var(--fu-text-muted)', fontStyle: 'italic', padding: '20px 0', textAlign: 'center' }}>
+                Nenhuma sessão registada hoje.
+              </p>
             )}
           </div>
         </div>
+
+        {/* Resumo de Limites Diários (AGORA DINÂMICO!) */}
+        <div className="painel-box">
+          <h3>Progresso dos Limites</h3>
+          <p className="box-desc">Lembra-te da meta para ganhares pontos!</p>
+          
+          <div className="limites-lista">
+            {estatisticas.limitesProgresso.length > 0 ? (
+              estatisticas.limitesProgresso.map((limite, index) => (
+                <div key={index} className={`limite-card ${index > 0 ? 'mt-3' : ''}`}>
+                  <div className="limite-header">
+                    <span className="limite-nome" style={{ textTransform: 'capitalize' }}>{limite.nome}</span>
+                    <span className="limite-status">{limite.tempoGastoString} / {limite.limiteString}</span>
+                  </div>
+                  <div className="site-barra-bg">
+                    <div 
+                      className="site-barra-fill" 
+                      style={{ width: `${limite.percentagem}%`, background: limite.corBarra }}
+                    ></div>
+                  </div>
+                  <p className={`limite-alerta ${limite.statusClasse}`}>{limite.mensagem}</p>
+                </div>
+              ))
+            ) : (
+              <p style={{ color: 'var(--fu-text-muted)', fontStyle: 'italic', padding: '20px 0', textAlign: 'center' }}>
+                Nenhum limite configurado no banco de dados. Vai à aba "Limites de Uso" para criar um!
+              </p>
+            )}
+          </div>
+        </div>
+
       </div>
     </div>
   );

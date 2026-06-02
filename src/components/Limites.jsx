@@ -3,15 +3,24 @@ import React, { useState, useEffect } from 'react';
 import '../styles/Limites.css';
 import { limitesAPI } from '../api';
 
+// Dicionário para traduzir o ID numérico do banco para o nome bonito na tela
+const MAPA_SITES = {
+  1: 'Instagram',
+  2: 'Facebook',
+  3: 'YouTube',
+  4: 'TikTok',
+  5: 'Twitter / X',
+  6: 'Netflix'
+};
+
 export default function Limites() {
   const [limits, setLimits] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Estados obrigatórios do FlowUp
-  const [nomeLimite, setNomeLimite] = useState('');
-  const [dominio, setDominio] = useState('');
-  const [tipoBloqueio, setTipoBloqueio] = useState('diario'); // 'permanente' ou 'diario'
+  // Estados alinhados com o seu Back-End (id_site agora começa com o ID do primeiro item do select)
+  const [idSite, setIdSite] = useState('1'); 
+  const [tipoBloqueio, setTipoBloqueio] = useState('diario');
   const [tempoLimite, setTempoLimite] = useState('');
 
   useEffect(() => {
@@ -23,32 +32,31 @@ export default function Limites() {
       const dados = await limitesAPI.listar();
       setLimits(dados || []);
     } catch (err) {
-      console.error("Erro ao carregar limites:", err);
+      console.error("Erro ao carregar os limites:", err);
     }
+  };
+
+  const abrirModalNovo = () => {
+    setIdSite('1'); // Reseta para o ID 1 (Instagram)
+    setTipoBloqueio('diario');
+    setTempoLimite('');
+    setIsModalOpen(true);
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (!nomeLimite || !dominio) {
-      alert("Por favor, preencha todos os campos obrigatórios.");
-      return;
-    }
 
     setLoading(true);
     try {
       const tempoFinal = tipoBloqueio === 'permanente' ? 'Permanente' : tempoLimite;
       
-      // Enviando os dados capturados do formulário digitado
-      await limitesAPI.criar(dominio, tempoFinal); 
+      // Envia o id_site convertido para Número, eliminando o erro de bigint!
+      await limitesAPI.criar(Number(idSite), tempoFinal); 
       
-      // Reseta o estado e fecha o modal
       setIsModalOpen(false);
-      setNomeLimite('');
-      setDominio('');
-      setTempoLimite('');
       carregarLimites(); 
     } catch (err) {
-      alert("Falha ao salvar a restrição. Verifique a conexão com o servidor.");
+      alert("Erro ao gravar o limite. Verifique se o ID do site existe na tabela SITE.");
     } finally {
       setLoading(false);
     }
@@ -56,136 +64,94 @@ export default function Limites() {
 
   return (
     <div className="flowup-limites-page">
-      <div className="flowup-container-inner">
-        
-        {/* Topbar Exclusiva FlowUp */}
-        <div className="flowup-header-section">
-          <h2 className="flowup-title-main">Limites de Uso</h2>
-          <button className="btn-add-limite" onClick={() => setIsModalOpen(true)}>
-            <span>+</span> Adicionar Restrição
-          </button>
+      {/* Cabeçalho */}
+      <div className="flowup-header-section" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+        <div>
+          <h2 style={{ color: 'var(--fu-text-main)', margin: 0, fontFamily: 'Syne, sans-serif' }}>Limites de Uso</h2>
+          <p style={{ color: 'var(--fu-text-muted)', margin: '4px 0 0 0' }}>Gerencie suas restrições de tempo para manter o foco.</p>
         </div>
-
-        {/* Novo Grid Exclusivo de Cards */}
-        <div className="flowup-grid-layout">
-          {limits.length === 0 ? (
-            <p style={{ color: 'var(--flow-text-muted)', gridColumn: '1/-1' }}>
-              Nenhum limitador ativo encontrado. Clique acima para configurar o seu primeiro bloqueio.
-            </p>
-          ) : (
-            limits.map((l) => (
-              <div key={l.id_limite || l.id} className="flowup-card-exclusivo">
-                <span className="card-badge-status">Ativo</span>
-                
-                <div>
-                  <span className="card-meta-title">Website Bloqueado</span>
-                  <h3 className="card-domain-name">{l.id_site}</h3>
-                </div>
-
-                <div className="card-info-box">
-                  <div className="card-info-row">
-                    <span style={{ color: 'var(--flow-text-muted)' }}>Regra:</span>
-                    <span style={{ fontWeight: '600' }}>
-                      {l.tempo_limite === 'Permanente' ? 'Bloqueio Total' : `Máx. ${l.tempo_limite}`}
-                    </span>
-                  </div>
-                  <div className="card-info-row" style={{ marginTop: '10px' }}>
-                    <span style={{ color: 'var(--flow-text-muted)' }}>Progresso Diário</span>
-                    <span style={{ color: 'var(--flow-accent)', fontWeight: 'bold' }}>5%</span>
-                  </div>
-                  <div className="mini-progress-bar-bg">
-                    <div className="mini-progress-bar-fill"></div>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-
+        <button className="fu-btn-primary" style={{ padding: '12px 24px' }} onClick={abrirModalNovo}>
+          + Adicionar Limite
+        </button>
       </div>
 
-      {/* MODAL CORRIGIDO CONTRA ERROS DE CLIQUE */}
+      {/* Listagem de Cards */}
+      {limits.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '50px 20px', background: 'var(--fu-surface)', borderRadius: '16px', border: '1px dashed var(--fu-border)' }}>
+          <p style={{ color: 'var(--fu-text-muted)', margin: 0 }}>Nenhum bloqueio configurado para este usuário.</p>
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+          {limits.map((l, index) => (
+            <div key={index} className="fu-feature-card" style={{ background: 'var(--fu-surface-solid)', padding: '24px', borderRadius: '16px', border: '1px solid var(--fu-border)' }}>
+              <span style={{ fontSize: '0.8rem', color: 'var(--fu-text-muted)', textTransform: 'uppercase', fontWeight: 'bold' }}>Rede Social / App</span>
+              {/* Usa o mapa para exibir o nome em vez do número bruto do ID */}
+              <h3 style={{ margin: '6px 0 16px 0', color: 'var(--fu-text-main)', fontFamily: 'Syne' }}>
+                {MAPA_SITES[l.id_site] || `Site Corporativo (ID: ${l.id_site})`}
+              </h3>
+              <p style={{ color: 'var(--fu-text-muted)', margin: 0, fontSize: '0.95rem' }}>
+                Regra: <strong style={{ color: 'var(--fu-primary)' }}>{l.tempo_limite === 'Permanente' ? 'Bloqueio Total' : `Máximo de ${l.tempo_limite}`}</strong>
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* MODAL AJUSTADO PARA DROPDOWN (SELECT) */}
       {isModalOpen && (
         <div className="flowup-modal-overlay">
           <div className="flowup-modal-window">
-            <h3>Configurar Nova Restrição</h3>
+            <h3 style={{ color: 'var(--fu-text-main)', marginBottom: '20px', fontFamily: 'Syne' }}>Configurar Restrição</h3>
             
             <form onSubmit={handleSave}>
-              
               <div className="flowup-form-group">
-                <label>Nome identificador do limite *</label>
-                <input 
-                  type="text" 
+                <label>Selecione a Plataforma</label>
+                <select 
                   className="flowup-input-text"
-                  placeholder="Ex: Distração de Estudos"
-                  value={nomeLimite}
-                  onChange={e => setNomeLimite(e.target.value)}
-                  required
-                />
+                  value={idSite} 
+                  onChange={e => setIdSite(e.target.value)}
+                  style={{ width: '100%', cursor: 'pointer' }}
+                >
+                  <option value="1">Instagram</option>
+                  <option value="2">Facebook</option>
+                  <option value="3">YouTube</option>
+                  <option value="4">TikTok</option>
+                  <option value="5">Twitter / X</option>
+                  <option value="6">Netflix</option>
+                </select>
               </div>
 
               <div className="flowup-form-group">
-                <label>Domínio do Website *</label>
-                <input 
-                  type="text" 
-                  className="flowup-input-text"
-                  placeholder="Ex: instagram.com"
-                  value={dominio}
-                  onChange={e => setDominio(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="flowup-form-group">
-                <label>Tipo de restrição</label>
+                <label>Modo de Bloqueio</label>
                 <div className="flowup-radio-container">
                   <label className="flowup-radio-option">
-                    <input 
-                      type="radio" 
-                      name="flowup-tipo" 
-                      value="permanente" 
-                      checked={tipoBloqueio === 'permanente'} 
-                      onChange={() => setTipoBloqueio('permanente')} 
-                    />
-                    Bloquear permanentemente
-                  </label>
-                  <label className="flowup-radio-option">
-                    <input 
-                      type="radio" 
-                      name="flowup-tipo" 
-                      value="diario" 
-                      checked={tipoBloqueio === 'diario'} 
-                      onChange={() => setTipoBloqueio('diario')} 
-                    />
-                    Definir limite diário de tempo
+                    <input type="radio" name="modo_bloqueio" checked={tipoBloqueio === 'diario'} onChange={() => setTipoBloqueio('diario')} />
+                    Tempo Limite Diário
                   </label>
                 </div>
               </div>
 
-              {/* Só exibe o campo de tempo se for diário */}
               {tipoBloqueio === 'diario' && (
                 <div className="flowup-form-group">
-                  <label>Tempo Máximo Permitido *</label>
+                  <label>Tempo Permitido (em minutos)</label>
                   <input 
-                    type="text" 
-                    className="flowup-input-text"
-                    placeholder="Ex: 1h, 45m"
-                    value={tempoLimite}
-                    onChange={e => setTempoLimite(e.target.value)}
-                    required
+                    type="number" 
+                    className="flowup-input-text" 
+                    placeholder="Ex: 60" 
+                    value={tempoLimite} 
+                    onChange={e => setTempoLimite(e.target.value)} 
+                    min="1"
+                    required 
                   />
                 </div>
               )}
 
-              <div className="flowup-modal-actions">
-                <button type="button" className="btn-flow-cancel" onClick={() => setIsModalOpen(false)}>
-                  Cancelar
-                </button>
-                <button type="submit" className="btn-add-limite" disabled={loading}>
-                  {loading ? 'Salvando...' : 'Confirmar Limite'}
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '24px' }}>
+                <button type="button" className="fu-btn-login" style={{ padding: '10px 20px' }} onClick={() => setIsModalOpen(false)}>Cancelar</button>
+                <button type="submit" className="fu-btn-primary" style={{ padding: '10px 24px' }} disabled={loading}>
+                  {loading ? 'Salvando...' : 'Salvar Limite'}
                 </button>
               </div>
-
             </form>
           </div>
         </div>
