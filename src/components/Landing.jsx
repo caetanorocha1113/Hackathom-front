@@ -14,9 +14,9 @@ export default function Landing({ onLoginSuccess }) {
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [sucesso, setSucesso] = useState(''); // Estado para mensagem de sucesso sem alert()
+  const [sucesso, setSucesso] = useState('');
 
-  // Sincroniza o alternador de temas com a árvore do documento
+  // Sincroniza o alternador de temas
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
@@ -33,15 +33,13 @@ export default function Landing({ onLoginSuccess }) {
     try {
       if (isRegister) {
         await authAPI.register(nome, email, senha);
-        // Em vez do alert() antigo, definimos a mensagem de sucesso e mudamos para a tela de login
         setSucesso('Cadastro realizado com sucesso! Faça login para acessar o FlowUp.');
         setIsRegister(false);
-        // Limpa o campo do nome por segurança
         setNome('');
       } else {
         const data = await authAPI.login(email, senha);
         if (data.token) {
-          localStorage.setItem('token', data.token); // Grava o JWT real retornado do Supabase
+          localStorage.setItem('token', data.token);
           onLoginSuccess();
         }
       }
@@ -53,89 +51,89 @@ export default function Landing({ onLoginSuccess }) {
   };
 
   return (
-    <div className="fu-landing-page">
-      {/* HEADER PRINCIPAL */}
-      <header className="fu-landing-header">
-        <div className="fu-logo-container">
-          <div className="fu-logo-icon">⚡</div>
-          <span className="fu-logo-text">FlowUp</span>
-        </div>
-        <div className="fu-header-actions">
-          <button onClick={toggleTheme} className="fu-btn-theme">
-            {theme === 'dark' ? '☀️ Mode' : '🌙 Mode'}
-          </button>
-          <button onClick={() => { setShowAuthModal(true); setIsRegister(false); setError(''); setSucesso(''); }} className="fu-btn-nav-login">
-            Acessar Painel
-          </button>
-        </div>
-      </header>
-
-      {/* HERO SECTION */}
-      <section className="fu-hero-section">
-        <div className="fu-hero-content">
-          <span className="fu-badge-gradient">Solução Definitiva para Foco</span>
-          <h1 className="fu-hero-title">
-            Retome o controle do seu tempo digital
-          </h1>
-          <p className="fu-hero-subtitle">
-            Monitore o uso de redes sociais, estipule limites rígidos baseados em dados reais do Supabase e seja recompensado com pontos e gamificação pela sua produtividade.
-          </p>
-          <div className="fu-hero-cta-group">
-            <button onClick={() => { setShowAuthModal(true); setIsRegister(true); setError(''); setSucesso(''); }} className="fu-btn-primary fu-btn-hero">
-              Começar Agora — Grátis
-            </button>
-            <a href="#features" className="fu-btn-secondary">Conhecer Recursos</a>
+    <div className="fu-landing">
+      {/* O fu-container garante que nada fica colado nas bordas e centraliza o conteúdo */}
+      <div className="fu-container">
+        
+        {/* HEADER PRINCIPAL */}
+        <nav className="fu-navbar">
+          <div className="fu-brand">
+            <div className="fu-logo-mark">⚡</div>
+            FlowUp
           </div>
-        </div>
+          <div className="fu-nav-controls">
+            <button onClick={toggleTheme} className="fu-btn-toggle" title="Alternar Tema">
+              {theme === 'dark' ? '☀️' : '🌙'}
+            </button>
+            <button onClick={() => { setShowAuthModal(true); setIsRegister(false); setError(''); setSucesso(''); }} className="fu-btn-login">
+              Acessar Painel
+            </button>
+          </div>
+        </nav>
 
-        {/* PREVIEW DO EXTENSÃO / MOCKUP EM CSS */}
-        <div className="fu-hero-preview">
-          <div className="fu-mock-browser">
+        {/* HERO SECTION */}
+        <header className="fu-hero">
+          <div className="fu-hero-content">
+            <div className="fu-badge">Solução Definitiva para Foco</div>
+            <h1 className="fu-hero-title">
+              Retome o controle do seu <span>tempo digital</span>
+            </h1>
+            <p className="fu-hero-p">
+              Monitore o uso de redes sociais, estipule limites rígidos baseados em dados reais do Supabase e seja recompensado com pontos e gamificação pela sua produtividade.
+            </p>
+            <div>
+              <button onClick={() => { setShowAuthModal(true); setIsRegister(true); setError(''); setSucesso(''); }} className="fu-btn-primary">
+                Começar Agora — Grátis
+              </button>
+            </div>
+          </div>
+
+          {/* MOCKUP / PREVIEW EXCLUSIVO (Substitui imagens estáticas) */}
+          <div className="fu-hero-preview">
             <div className="fu-mock-header">
               <div className="fu-mock-dot"></div>
               <div className="fu-mock-dot"></div>
               <div className="fu-mock-dot"></div>
             </div>
             <div className="fu-mock-timer">
-              <span style={{ fontSize: '0.85rem', color: 'var(--fu-text-muted)', display: 'block', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '1px' }}>Tempo Restante no Instagram</span>
-              <div style={{ fontSize: '2.5rem', fontWeight: '800', fontFamily: 'Syne, sans-serif', color: 'var(--fu-primary)' }}>14:59</div>
-              <p style={{ fontSize: '0.8rem', color: 'var(--fu-text-muted)', marginTop: '8px' }}>Sua produtividade hoje está 25% maior!</p>
+              <span style={{ fontSize: '0.85rem', color: 'var(--fu-text-muted)', display: 'block', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700 }}>Tempo Restante no Instagram</span>
+              <div style={{ fontSize: '3rem', fontWeight: '800', fontFamily: 'Syne, sans-serif', color: 'var(--fu-primary)' }}>14:59</div>
+              <p style={{ fontSize: '0.9rem', color: 'var(--fu-text-muted)', marginTop: '12px' }}>Sua produtividade hoje está 25% maior!</p>
             </div>
           </div>
-        </div>
-      </section>
+        </header>
 
-      {/* SEÇÃO DE RECURSOS */}
-      <section id="features" className="fu-features-grid">
-        <div className="fu-feature-card">
-          <div style={{ fontSize: '2rem', marginBottom: '12px' }}>📊</div>
-          <h3>Painel Analytics</h3>
-          <p>Visualização interativa baseada em gráficos sobre o seu tempo investido em foco contra o desperdício em redes sociais.</p>
-        </div>
+        {/* SEÇÃO DE RECURSOS */}
+        <section id="features" className="fu-features-grid">
+          <div className="fu-feature-card">
+            <div className="fu-feat-icon">📊</div>
+            <h3>Painel Analytics</h3>
+            <p>Visualização interativa baseada em gráficos sobre o seu tempo investido em foco contra o desperdício em redes sociais.</p>
+          </div>
 
-        <div className="fu-feature-card">
-          <div style={{ fontSize: '2rem', marginBottom: '12px' }}>⏱️</div>
-          <h3>Limites Customizados</h3>
-          <p>Escolha plataformas pré-mapeadas direto do banco de dados e estipule tempos máximos saudáveis de navegação diária.</p>
-        </div>
+          <div className="fu-feature-card">
+            <div className="fu-feat-icon">⏱️</div>
+            <h3>Limites Customizados</h3>
+            <p>Escolha plataformas pré-mapeadas direto do banco de dados e estipule tempos máximos saudáveis de navegação diária.</p>
+          </div>
 
-        <div className="fu-feature-card">
-          <div style={{ fontSize: '2rem', marginBottom: '12px' }}>🏆</div>
-          <h3>Gamificação e XP</h3>
-          <p>Suba no ranking da comunidade global acumulando pontos sempre que respeitar seus horários de estudo e trabalho.</p>
-        </div>
-      </section>
+          <div className="fu-feature-card">
+            <div className="fu-feat-icon">🏆</div>
+            <h3>Gamificação e XP</h3>
+            <p>Suba no ranking da comunidade global acumulando pontos sempre que respeitar seus horários de estudo e trabalho.</p>
+          </div>
+        </section>
 
-      {/* FOOTER */}
-      <footer style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--fu-text-muted)', fontSize: '0.85rem', borderTop: '1px solid var(--fu-border)' }}>
-        © {new Date().getFullYear()} FlowUp Labs. Desenvolvido para o Hackathon. Todos os direitos reservados.
-      </footer>
+        {/* FOOTER */}
+        <footer style={{ textAlign: 'center', padding: '40px 0', color: 'var(--fu-text-muted)', fontSize: '0.85rem', borderTop: '1px solid var(--fu-border)' }}>
+          © {new Date().getFullYear()} FlowUp Labs. Desenvolvido para o Hackathon. Todos os direitos reservados.
+        </footer>
+      </div>
 
-      {/* MODAL DE AUTENTICAÇÃO (LOGIN / CADASTRO) */}
+      {/* MODAL DE AUTENTICAÇÃO */}
       {showAuthModal && (
-        <div className="fu-modal-overlay" onClick={() => setShowAuthModal(false)}>
-          <div className="fu-modal-card" onClick={(e) => e.stopPropagation()}>
-            <button className="fu-modal-close" onClick={() => setShowAuthModal(false)}>×</button>
+        <div className="flowup-modal-overlay" onClick={() => setShowAuthModal(false)} style={{ zIndex: 9999 }}>
+          <div className="flowup-modal-window" onClick={(e) => e.stopPropagation()}>
             
             <div style={{ textAlign: 'center', marginBottom: '24px' }}>
               <span style={{ fontSize: '2rem' }}>{isRegister ? '🚀' : '🔒'}</span>
@@ -156,7 +154,7 @@ export default function Landing({ onLoginSuccess }) {
                 </div>
               )}
 
-              {/* Notificação de Sucesso Real (Substituiu o alert) */}
+              {/* Notificação de Sucesso Real */}
               {sucesso && (
                 <div style={{ color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', padding: '10px 14px', borderRadius: '8px', fontSize: '0.85rem', border: '1px solid rgba(16, 185, 129, 0.2)', textAlign: 'center' }}>
                   ✅ {sucesso}
@@ -164,12 +162,11 @@ export default function Landing({ onLoginSuccess }) {
               )}
 
               {isRegister && (
-                <div>
-                  <label style={{ fontSize: '0.85rem', color: 'var(--fu-text-muted)', display: 'block', marginBottom: '6px' }}>Nome Completo</label>
+                <div className="flowup-form-group" style={{ marginBottom: 0 }}>
+                  <label>Nome Completo</label>
                   <input 
                     type="text" 
                     className="flowup-input-text" 
-                    style={{ background: 'var(--fu-bg)' }} 
                     value={nome} 
                     onChange={e => setNome(e.target.value)} 
                     placeholder="Seu nome ou apelido"
@@ -178,12 +175,11 @@ export default function Landing({ onLoginSuccess }) {
                 </div>
               )}
               
-              <div>
-                <label style={{ fontSize: '0.85rem', color: 'var(--fu-text-muted)', display: 'block', marginBottom: '6px' }}>E-mail</label>
+              <div className="flowup-form-group" style={{ marginBottom: 0 }}>
+                <label>E-mail</label>
                 <input 
                   type="email" 
                   className="flowup-input-text" 
-                  style={{ background: 'var(--fu-bg)' }} 
                   value={email} 
                   onChange={e => setEmail(e.target.value)} 
                   placeholder="exemplo@email.com"
@@ -191,12 +187,11 @@ export default function Landing({ onLoginSuccess }) {
                 />
               </div>
 
-              <div>
-                <label style={{ fontSize: '0.85rem', color: 'var(--fu-text-muted)', display: 'block', marginBottom: '6px' }}>Senha</label>
+              <div className="flowup-form-group" style={{ marginBottom: 0 }}>
+                <label>Senha</label>
                 <input 
                   type="password" 
                   className="flowup-input-text" 
-                  style={{ background: 'var(--fu-bg)' }} 
                   value={senha} 
                   onChange={e => setSenha(e.target.value)} 
                   placeholder="••••••••"
@@ -204,7 +199,7 @@ export default function Landing({ onLoginSuccess }) {
                 />
               </div>
 
-              <button type="submit" className="fu-btn-primary" style={{ width: '100%', marginTop: '10px', padding: '12px' }} disabled={loading}>
+              <button type="submit" className="fu-btn-primary" style={{ width: '100%', marginTop: '10px' }} disabled={loading}>
                 {loading ? 'Processando...' : isRegister ? 'Concluir Cadastro' : 'Entrar no Painel'}
               </button>
             </form>
