@@ -1,0 +1,261 @@
+/* src/styles/Limites.css */
+
+/* Paleta FlowUp Oficial */
+:root {
+  --flow-bg: #0A191E;         /* Azul-petróleo profundo */
+  --flow-card: #112A32;       /* Tom médio para os containers */
+  --flow-input: #061114;      /* Fundo ultra escuro para campos */
+  --flow-accent: #2CB67D;     /* Verde esmeralda FlowUp */
+  --flow-border: #1E3F4C;     /* Linhas de divisão sutis */
+  --flow-text-main: #FFFFFF;
+  --flow-text-muted: #8A9CA5;
+}
+
+.flowup-limites-page {
+  background-color: var(--flow-bg);
+  min-height: 100vh;
+  padding: 40px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--flow-text-main);
+  box-sizing: border-box;
+}
+
+.flowup-header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  border-bottom: 1px solid var(--flow-border);
+  padding-bottom: 20px;
+}
+
+.flowup-title-main {
+  font-family: 'Syne', sans-serif;
+  font-size: 2rem;
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Botão de Ação Principal (Estilo FlowUp) */
+.btn-add-limite {
+  background-color: var(--flow-accent);
+  color: var(--flow-bg);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(44, 182, 125, 0.2);
+}
+
+.btn-add-limite:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+/* Novo Grid de Cards Exclusivo (Zero cópias do StayFree) */
+.flowup-grid-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.flowup-card-exclusivo {
+  background-color: var(--flow-card);
+  border: 1px solid var(--flow-border);
+  border-radius: 16px;
+  padding: 24px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: border-color 0.2s ease;
+}
+
+.flowup-card-exclusivo:hover {
+  border-color: var(--flow-accent);
+}
+
+.card-badge-status {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background-color: rgba(44, 182, 125, 0.1);
+  color: var(--flow-accent);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.card-meta-title {
+  font-size: 0.8rem;
+  color: var(--flow-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.card-domain-name {
+  font-size: 1.3rem;
+  margin: 0 0 16px 0;
+  color: var(--flow-text-main);
+  font-weight: 600;
+}
+
+.card-info-box {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 20px;
+  font-size: 0.85rem;
+}
+
+.card-info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.card-info-row:last-child {
+  margin-bottom: 0;
+}
+
+/* Barra de progresso circular ou linear minimalista interna */
+.mini-progress-bar-bg {
+  background-color: var(--flow-input);
+  height: 6px;
+  border-radius: 3px;
+  width: 100%;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.mini-progress-bar-fill {
+  background-color: var(--flow-accent);
+  height: 100%;
+  width: 5%; /* Simulação de uso */
+}
+
+/* ── MODAL COMPLETAMENTE CORRIGIDO (CLIQUES LIBERADOS) ── */
+.flowup-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(4, 10, 12, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  pointer-events: auto; /* Garante que os cliques funcionem */
+}
+
+.flowup-modal-window {
+  background-color: var(--flow-card);
+  border: 1px solid var(--flow-border);
+  border-radius: 20px;
+  padding: 32px;
+  width: 100%;
+  max-width: 450px;
+  box-sizing: border-box;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  position: relative;
+  z-index: 10001;
+  pointer-events: auto; /* Garante a interatividade dos inputs */
+}
+
+.flowup-modal-window h3 {
+  font-family: 'Syne', sans-serif;
+  margin: 0 0 24px 0;
+  font-size: 1.4rem;
+  color: var(--flow-text-main);
+}
+
+.flowup-form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.flowup-form-group label {
+  font-size: 0.85rem;
+  color: var(--flow-text-muted);
+  font-weight: 500;
+}
+
+/* Inputs super visíveis e clicáveis */
+.flowup-input-text {
+  width: 100%;
+  padding: 14px;
+  background-color: var(--flow-input);
+  border: 1px solid var(--flow-border);
+  color: var(--flow-text-main);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.flowup-input-text:focus {
+  border-color: var(--flow-accent);
+}
+
+/* Área de seleção de rádio robusta */
+.flowup-radio-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: rgba(0, 0, 0, 0.15);
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid var(--flow-border);
+}
+
+.flowup-radio-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--flow-text-main);
+  cursor: pointer;
+}
+
+.flowup-radio-option input[type="radio"] {
+  accent-color: var(--flow-accent);
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.flowup-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.btn-flow-cancel {
+  background: transparent;
+  border: 1px solid var(--flow-border);
+  color: var(--flow-text-muted);
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.btn-flow-cancel:hover {
+  color: var(--flow-text-main);
+  border-color: var(--flow-text-muted);
+}

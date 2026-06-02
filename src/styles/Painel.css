@@ -1,0 +1,15 @@
+/* src/styles/Painel.css */
+.panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.panel-header h2 { font-family: 'Syne', sans-serif; font-size: 1.4rem; }
+.date-badge { font-size: .8rem; color: var(--text3); background: var(--bg2); padding: 5px 12px; border-radius: 6px; }
+
+.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+.stat-card { background: var(--bg1); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; }
+.stat-label { font-size: .75rem; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; display: block; margin-bottom: 8px;}
+.stat-val { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 700; }
+.stat-card.accent-card { border-color: rgba(45,212,160,.3); background: var(--accent-dim); color: var(--accent); }
+
+.panel-grid { display: grid; grid-template-columns: 1fr 340px; gap: 18px; }
+.chart-card, .sites-card { background: var(--bg1); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 22px; }
+.chart-wrap { height: 200px; display: flex; justify-content: center; }
+.site-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem;}
