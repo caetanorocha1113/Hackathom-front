@@ -1,5 +1,5 @@
 // src/api.js
-const API_URL = 'https://hackaton-back-5tsv.onrender.com';
+const API_URL = 'https://hackaton-back-5tsv.onrender.com/api'; // URL do teu backend
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token'); 
